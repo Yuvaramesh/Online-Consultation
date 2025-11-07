@@ -330,7 +330,7 @@
 
         try {
           const response = await fetch(
-            "http://localhost:5000/api/appointments"
+            "https://one0qbit-online-consultation.onrender.com/api/appointments"
           );
           const result = await response.json();
 
@@ -452,7 +452,7 @@
 
         try {
           const response = await fetch(
-            `http://localhost:5000/api/appointments/${id}/approve`,
+            `https://one0qbit-online-consultation.onrender.com/api/appointments/${id}/approve`,
             {
               method: "POST",
             }
@@ -480,7 +480,7 @@
 
         try {
           const response = await fetch(
-            `http://localhost:5000/api/appointments/${id}/reject`,
+            `https://one0qbit-online-consultation.onrender.com/api/appointments/${id}/reject`,
             {
               method: "POST",
             }

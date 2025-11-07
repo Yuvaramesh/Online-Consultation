@@ -305,7 +305,7 @@ def reject_appointment(appointment_id):
         )
 
         # Send rejection email with reschedule link
-        reschedule_link = "http://localhost:5000"  # Your booking page
+        reschedule_link = "https://one0qbit-online-consultation.onrender.com/api/appointments"  # Your booking page
         email_body = f"""
         <html>
             <body>
