@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Doctor Dashboard - Appointments</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: #f5f7fa;
+        padding: 20px;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+      }
+
+      .header h1 {
+        font-size: 32px;
+        margin-bottom: 5px;
+      }
+
+      .header p {
+        opacity: 0.9;
+      }
+
+      .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+      }
+
+      .stat-card {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+      }
+
+      .stat-card h3 {
+        color: #666;
+        font-size: 14px;
+        margin-bottom: 10px;
+      }
+
+      .stat-card .number {
+        font-size: 32px;
+        font-weight: bold;
+        color: #333;
+      }
+
+      .appointments-container {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+      }
+
+      .appointments-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+      }
+
+      .appointments-header h2 {
+        color: #333;
+        font-size: 24px;
+      }
+
+      .refresh-btn {
+        padding: 10px 20px;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+
+      .refresh-btn:hover {
+        background: #5568d3;
+        transform: translateY(-2px);
+      }
+
+      .appointment-card {
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+      }
+
+      .appointment-card:hover {
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+      }
+
+      .appointment-card.priority-high {
+        border-left: 5px solid #e74c3c;
+      }
+
+      .appointment-card.priority-medium {
+        border-left: 5px solid #f39c12;
+      }
+
+      .appointment-card.priority-low {
+        border-left: 5px solid #27ae60;
+      }
+
+      .appointment-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+
+      .patient-name {
+        font-size: 20px;
+        font-weight: bold;
+        color: #333;
+      }
+
+      .priority-badge {
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .priority-high {
+        background: #fee;
+        color: #e74c3c;
+      }
+
+      .priority-medium {
+        background: #fef5e7;
+        color: #f39c12;
+      }
+
+      .priority-low {
+        background: #eafaf1;
+        color: #27ae60;
+      }
+
+      .appointment-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 15px;
+      }
+
+      .detail-item {
+        color: #666;
+      }
+
+      .detail-item strong {
+        color: #333;
+        display: block;
+        margin-bottom: 5px;
+      }
+
+      .issues-box {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+      }
+
+      .issues-box strong {
+        display: block;
+        margin-bottom: 8px;
+        color: #333;
+      }
+
+      .status-badge {
+        display: inline-block;
+        padding: 5px 12px;
+        border-radius: 15px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .status-pending {
+        background: #fff3cd;
+        color: #856404;
+      }
+
+      .status-approved {
+        background: #d4edda;
+        color: #155724;
+      }
+
+      .status-rejected {
+        background: #f8d7da;
+        color: #721c24;
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+      }
+
+      .btn {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .btn-approve {
+        background: #27ae60;
+        color: white;
+      }
+
+      .btn-approve:hover {
+        background: #229954;
+      }
+
+      .btn-reject {
+        background: #e74c3c;
+        color: white;
+      }
+
+      .btn-reject:hover {
+        background: #c0392b;
+      }
+
+      .btn:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #999;
+      }
+
+      .empty-state svg {
+        width: 100px;
+        height: 100px;
+        margin-bottom: 20px;
+        opacity: 0.3;
+      }
+
+      .loading {
+        text-align: center;
+        padding: 40px;
+        color: #666;
+      }
+
+      .back-link {
+        display: inline-block;
+        margin-bottom: 20px;
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      .back-link:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <a href="/" class="back-link">← Back to Booking Page</a>
+
+    <div class="header">
+      <h1>👨‍⚕️ Doctor Dashboard</h1>
+      <p>Manage patient appointments and consultations</p>
+    </div>
+
+    <div class="stats-container">
+      <div class="stat-card">
+        <h3>Total Appointments</h3>
+        <div class="number" id="totalCount">0</div>
+      </div>
+      <div class="stat-card">
+        <h3>Pending</h3>
+        <div class="number" id="pendingCount">0</div>
+      </div>
+      <div class="stat-card">
+        <h3>Approved</h3>
+        <div class="number" id="approvedCount">0</div>
+      </div>
+      <div class="stat-card">
+        <h3>High Priority</h3>
+        <div class="number" id="highPriorityCount">0</div>
+      </div>
+    </div>
+
+    <div class="appointments-container">
+      <div class="appointments-header">
+        <h2>Patient Appointments</h2>
+        <button class="refresh-btn" onclick="loadAppointments()">
+          🔄 Refresh
+        </button>
+      </div>
+
+      <div id="appointmentsList">
+        <div class="loading">Loading appointments...</div>
+      </div>
+    </div>
+
+    <script>
+      async function loadAppointments() {
+        const listDiv = document.getElementById("appointmentsList");
+        listDiv.innerHTML =
+          '<div class="loading">Loading appointments...</div>';
+
+        try {
+          const response = await fetch(
+            "http://localhost:5000/api/appointments"
+          );
+          const result = await response.json();
+
+          if (result.success && result.appointments.length > 0) {
+            updateStats(result.appointments);
+            displayAppointments(result.appointments);
+          } else {
+            listDiv.innerHTML = `
+                        <div class="empty-state">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                            </svg>
+                            <h3>No appointments yet</h3>
+                            <p>New patient bookings will appear here</p>
+                        </div>
+                    `;
+          }
+        } catch (error) {
+          listDiv.innerHTML = `
+                    <div class="empty-state">
+                        <h3>Error loading appointments</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+        }
+      }
+
+      function updateStats(appointments) {
+        const total = appointments.length;
+        const pending = appointments.filter(
+          (a) => a.status === "pending"
+        ).length;
+        const approved = appointments.filter(
+          (a) => a.status === "approved"
+        ).length;
+        const highPriority = appointments.filter(
+          (a) => a.priority === "High"
+        ).length;
+
+        document.getElementById("totalCount").textContent = total;
+        document.getElementById("pendingCount").textContent = pending;
+        document.getElementById("approvedCount").textContent = approved;
+        document.getElementById("highPriorityCount").textContent = highPriority;
+      }
+
+      function displayAppointments(appointments) {
+        const listDiv = document.getElementById("appointmentsList");
+
+        listDiv.innerHTML = appointments
+          .map(
+            (apt) => `
+                <div class="appointment-card priority-${apt.priority.toLowerCase()}">
+                    <div class="appointment-header">
+                        <div class="patient-name">${apt.patient_name}</div>
+                        <span class="priority-badge priority-${apt.priority.toLowerCase()}">
+                            ${apt.priority} Priority
+                        </span>
+                    </div>
+
+                    <div class="appointment-details">
+                        <div class="detail-item">
+                            <strong>📧 Email</strong>
+                            ${apt.patient_email}
+                        </div>
+                        <div class="detail-item">
+                            <strong>🕒 Preferred Time</strong>
+                            ${new Date(apt.preferred_time).toLocaleString()}
+                        </div>
+                        <div class="detail-item">
+                            <strong>📅 Booked On</strong>
+                            ${new Date(apt.created_at).toLocaleString()}
+                        </div>
+                        <div class="detail-item">
+                            <strong>Status</strong>
+                            <span class="status-badge status-${apt.status}">${
+              apt.status
+            }</span>
+                        </div>
+                    </div>
+
+                    <div class="issues-box">
+                        <strong>🏥 Medical Issues / Symptoms:</strong>
+                        ${apt.issues}
+                    </div>
+
+                    ${
+                      apt.google_meet_link
+                        ? `
+                        <div class="detail-item">
+                            <strong>🎥 Google Meet Link:</strong>
+                            <a href="${apt.google_meet_link}" target="_blank">${apt.google_meet_link}</a>
+                        </div>
+                    `
+                        : ""
+                    }
+
+                    ${
+                      apt.status === "pending"
+                        ? `
+                        <div class="action-buttons">
+                            <button class="btn btn-approve" onclick="approveAppointment('${apt._id}')">
+                                ✓ Approve
+                            </button>
+                            <button class="btn btn-reject" onclick="rejectAppointment('${apt._id}')">
+                                ✗ Reject
+                            </button>
+                        </div>
+                    `
+                        : ""
+                    }
+                </div>
+            `
+          )
+          .join("");
+      }
+
+      async function approveAppointment(id) {
+        if (!confirm("Approve this appointment?")) return;
+
+        try {
+          const response = await fetch(
+            `http://localhost:5000/api/appointments/${id}/approve`,
+            {
+              method: "POST",
+            }
+          );
+          const result = await response.json();
+
+          if (result.success) {
+            alert("Appointment approved! Confirmation email sent to patient.");
+            loadAppointments();
+          } else {
+            alert("Error: " + result.message);
+          }
+        } catch (error) {
+          alert("Network error: " + error.message);
+        }
+      }
+
+      async function rejectAppointment(id) {
+        if (
+          !confirm(
+            "Reject this appointment? Patient will receive a reschedule email."
+          )
+        )
+          return;
+
+        try {
+          const response = await fetch(
+            `http://localhost:5000/api/appointments/${id}/reject`,
+            {
+              method: "POST",
+            }
+          );
+          const result = await response.json();
+
+          if (result.success) {
+            alert("Appointment rejected. Reschedule email sent to patient.");
+            loadAppointments();
+          } else {
+            alert("Error: " + result.message);
+          }
+        } catch (error) {
+          alert("Network error: " + error.message);
+        }
+      }
+
+      // Load appointments on page load
+      loadAppointments();
+
+      // Auto-refresh every 30 seconds
+      setInterval(loadAppointments, 30000);
+    </script>
+  </body>
+</html>
